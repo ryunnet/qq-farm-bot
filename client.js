@@ -32,7 +32,6 @@ QQ经典农场 挂机脚本
 
 用法:
   node client.js --code <登录code> [--wx] [--interval <秒>] [--friend-interval <秒>]
-  node client.js --code <登录code> --delete-account --name <姓名> --cert-id <证件号> [--cert-type <类型>]
   node client.js --verify
   node client.js --decode <数据> [--hex] [--gate] [--type <消息类型>]
 
@@ -41,10 +40,6 @@ QQ经典农场 挂机脚本
   --wx                使用微信登录 (默认为QQ小程序)
   --interval          自己农场巡查完成后等待秒数, 默认10秒, 最低10秒
   --friend-interval   好友巡查完成后等待秒数, 默认1秒, 最低1秒
-  --delete-account    注销账号模式 (仅发起注销, 不启动挂机循环)
-  --name              注销实名姓名
-  --cert-id           注销证件号
-  --cert-type         证件类型, 默认0(中国身份证). 可用: 0/414/516/553/555 或 china/passport/hk/other
   --verify            验证proto定义
   --decode            解码PB数据 (运行 --decode 无参数查看详细帮助)
 
@@ -88,18 +83,6 @@ function parseArgs(args) {
         if (args[i] === '--friend-interval' && args[i + 1]) {
             const sec = parseInt(args[++i]);
             CONFIG.friendCheckInterval = Math.max(sec, 1) * 1000;  // 最低1秒
-        }
-        if (args[i] === '--delete-account') {
-            options.deleteAccountMode = true;
-        }
-        if (args[i] === '--name' && args[i + 1]) {
-            options.name = args[++i];
-        }
-        if (args[i] === '--cert-id' && args[i + 1]) {
-            options.certId = args[++i];
-        }
-        if (args[i] === '--cert-type' && args[i + 1]) {
-            options.certType = parseCertType(args[++i]);
         }
     }
     return options;
@@ -146,30 +129,6 @@ async function main() {
 
     // 连接并登录，登录成功后启动各功能模块
     connect(options.code, async () => {
-        if (options.deleteAccountMode) {
-            let exitCode = 0;
-            try {
-                const reply = await deleteAccount(options.name, options.certId, options.certType);
-                if (!reply.success) exitCode = 1;
-                // 服务端通常会下发 KickoutNotify，给 3 秒窗口接收
-                await sleep(3000);
-            } catch (e) {
-                exitCode = 1;
-                console.error(`[注销] 失败: ${e.message}`);
-            }
-
-            cleanupStatusBar();
-            cleanupTaskSystem();
-            stopFarmCheckLoop();
-            stopFriendCheckLoop();
-            stopSellLoop();
-            cleanup();
-            const ws = getWs();
-            if (ws) ws.close();
-            process.exit(exitCode);
-            return;
-        }
-
         // 处理邀请码 (仅微信环境)
         await processInviteCodes();
         
