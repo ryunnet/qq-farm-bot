@@ -4,26 +4,6 @@
   "count": 100,
   "rows": [
     {
-      "seedId": 20002,
-      "goodsId": 15,
-      "plantId": 1020002,
-      "name": "白萝卜",
-      "requiredLevel": 1,
-      "price": 2,
-      "unlocked": true,
-      "limitCount": 0,
-      "boughtNum": 0,
-      "exp": 1,
-      "expPerCycle": 2,
-      "growTimeSec": 60,
-      "growTimeStr": "1分钟",
-      "expPerHour": 120,
-      "expPerGold": 1,
-      "seasons": 1,
-      "fruitId": 40002,
-      "fruitCount": 5
-    },
-    {
       "seedId": 20003,
       "goodsId": 16,
       "plantId": 1020003,
